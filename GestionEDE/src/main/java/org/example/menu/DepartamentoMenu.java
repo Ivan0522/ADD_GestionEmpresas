@@ -1,148 +1,203 @@
+/**
+ * Paquete que contiene la implementación del menú de opciones para la gestión de departamentos.
+ */
 package org.example.menu;
 
 import org.example.entidades.Departamento;
-import org.example.DepartamentoRepository;
-import org.example.EmpresaRepository;
+import org.example.repositorios.DepartamentoRepository;
+import org.example.repositorios.EmpresaRepository;
 import org.hibernate.Session;
-import org.hibernate.SessionBuilder;
 import org.hibernate.SessionFactory;
 
 import java.util.List;
 
+/**
+ * Clase que implementa el menú para gestionar departamentos, incluyendo las opciones de crear,
+ * leer, actualizar, eliminar y listar empleados de un departamento.
+ */
 public class DepartamentoMenu extends Menu<Departamento, Integer> {
-    private final DepartamentoRepository repository;
+
+    /**
+     * Repositorio para gestionar las operaciones de la entidad Departamento.
+     */
+    private final DepartamentoRepository departamentoRepository;
+
+    /**
+     * Repositorio para gestionar las operaciones de la entidad Empresa.
+     */
     private final EmpresaRepository empresaRepository;
+
+    /**
+     * Fábrica de sesiones de Hibernate para realizar consultas personalizadas.
+     */
     private final SessionFactory sessionFactory;
 
-    public DepartamentoMenu(DepartamentoRepository repository, EmpresaRepository empresaRepository, SessionFactory sessionFactory) {
-        this.repository = repository;
+    /**
+     * Constructor que inicializa el menú con los repositorios y la fábrica de sesiones.
+     *
+     * @param departamentoRepository Repositorio de departamentos.
+     * @param empresaRepository      Repositorio de empresas.
+     * @param sessionFactory         Fábrica de sesiones de Hibernate.
+     */
+    public DepartamentoMenu(DepartamentoRepository departamentoRepository, EmpresaRepository empresaRepository, SessionFactory sessionFactory) {
+        this.departamentoRepository = departamentoRepository;
         this.empresaRepository = empresaRepository;
         this.sessionFactory = sessionFactory;
     }
 
+    /**
+     * Permite crear un nuevo departamento asociado a una empresa existente.
+     */
     @Override
-    public void create() {
-        System.out.print("Ingrese el nombre del departamento: ");
-        String nombre = scanner.nextLine();
+    public void crear() {
+        System.out.print("• Ingrese el nombre del departamento: ");
+        String nombre = sc.nextLine();
 
-        System.out.print("Ingrese el ID de la empresa asociada: ");
-        int empresaId = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print("• Ingrese la ID de la empresa asociada: ");
+        int empresaId = sc.nextInt();
+        sc.nextLine();
 
-        empresaRepository.read(empresaId).ifPresentOrElse(empresa -> {
+        empresaRepository.leer(empresaId).ifPresentOrElse(empresa -> {
             Departamento departamento = new Departamento(nombre, empresa);
-            repository.create(departamento);
-            System.out.println("Departamento creado exitosamente.");
-        }, () -> System.out.println("Empresa no encontrada."));
+            departamentoRepository.crear(departamento);
+            System.out.println(">> Departamento creado exitosamente.");
+        }, () -> System.out.println("xxx Empresa no encontrada xxx"));
     }
 
+    /**
+     * Permite leer la información de un departamento por su ID.
+     */
     @Override
-    public void read() {
-        System.out.print("Ingrese el ID del departamento: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+    public void leer() {
+        System.out.print("• Ingrese la ID del departamento: ");
+        int id = sc.nextInt();
+        sc.nextLine();
 
-        repository.read(id).ifPresentOrElse(
-                departamento -> System.out.println("Departamento encontrado: " + departamento.getNombre() +
-                        ", Empresa: " + departamento.getEmpresa().getNombre()),
-                () -> System.out.println("Departamento no encontrado.")
+        departamentoRepository.leer(id).ifPresentOrElse(
+                departamento ->
+                        System.out.println(">> Departamento encontrado: " + departamento.getNombre() +
+                                ", Empresa: " + departamento.getEmpresa().getNombre()),
+                () -> System.out.println("xxx Departamento no encontrado xxx")
         );
     }
 
+    /**
+     * Permite actualizar la información de un departamento.
+     */
     @Override
-    public void update() {
-        System.out.print("Ingrese el ID del departamento a actualizar: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
+    public void actualizar() {
+        System.out.print("• Ingrese la ID del departamento a actualizar: ");
+        int id = sc.nextInt();
+        sc.nextLine();
 
-        repository.read(id).ifPresentOrElse(departamento -> {
-            System.out.print("Ingrese el nuevo nombre del departamento: ");
-            departamento.setNombre(scanner.nextLine());
+        departamentoRepository.leer(id).ifPresentOrElse(departamento -> {
 
-            System.out.print("Ingrese el ID de la nueva empresa asociada: ");
-            int empresaId = scanner.nextInt();
-            scanner.nextLine();
+            System.out.print("• Ingrese el nuevo nombre del departamento: ");
+            departamento.setNombre(sc.nextLine());
 
-            empresaRepository.read(empresaId).ifPresentOrElse(empresa -> {
+            System.out.print("• Ingrese la ID de la nueva empresa asociada: ");
+            int empresaId = sc.nextInt();
+            sc.nextLine();
+
+            empresaRepository.leer(empresaId).ifPresentOrElse(empresa -> {
                 departamento.setEmpresa(empresa);
-                repository.update(departamento);
-                System.out.println("Departamento actualizado exitosamente.");
-            }, () -> System.out.println("Empresa no encontrada."));
-        }, () -> System.out.println("Departamento no encontrado."));
+                departamentoRepository.actualizar(departamento);
+                System.out.println(">> Departamento actualizado exitosamente.");
+            }, () -> System.out.println("xxx Empresa no encontrada xxx"));
+        }, () -> System.out.println("xxx Departamento no encontrado xxx"));
     }
 
+    /**
+     * Permite eliminar un departamento por su ID.
+     */
     @Override
-    public void delete() {
-        System.out.print("Ingrese el ID del departamento a eliminar: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        repository.delete(id);
-        System.out.println("Departamento eliminado exitosamente.");
+    public void borrar() {
+        System.out.print("• Ingrese la ID del departamento a eliminar: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+        departamentoRepository.borrar(id);
+        System.out.println(">> Departamento eliminado exitosamente.");
     }
 
-    @Override
+    /**
+     * Lista los empleados de un departamento específico.
+     */
+    // Método para listar los empleados asociados a un departamento específico
     public void listaEmpleadosDepartamento() {
+        // Solicitar al usuario el ID del departamento que desea consultar
+        System.out.print("• Ingrese la ID del departamento: ");
+        int departmentId = sc.nextInt();
+        sc.nextLine();
+
+        // Abrir una sesión de Hibernate para interactuar con la base de datos
         try (Session session = sessionFactory.openSession()) {
+
             session.beginTransaction();
 
-            // Código de consulta usando DTO
-            System.out.print("Ingrese el ID del departamento: ");
-            int departmentId = scanner.nextInt();
-            scanner.nextLine();
+            // Obtener la información del departamento especificado por el usuario
+            Departamento departamento = session.createQuery(
+                            "SELECT d FROM Departamento d WHERE d.id = :id", Departamento.class)
+                    .setParameter("id", departmentId)
+                    .uniqueResult();
 
+            // Obtener la lista de empleados asociados al departamento mediante una consulta HQL
             List<Object[]> empleados = session.createQuery(
                             "SELECT e.nombre, e.apellido, e.puesto FROM Empleado e WHERE e.departamento.id = :id", Object[].class)
                     .setParameter("id", departmentId)
                     .getResultList();
 
+            // Verificar si el departamento tiene empleados asignados
             if (empleados.isEmpty()) {
                 System.out.println("No hay empleados asignados a este departamento.");
             } else {
-                System.out.println("Empleados en el departamento:");
+                System.out.println("Empleados en el departamento de " + departamento.getNombre() + ":");
+                // Iterar y mostrar cada empleado asociado al departamento
                 empleados.forEach(empleado -> System.out.println(
                         "- Nombre: " + empleado[0] + ", Apellido: " + empleado[1] + ", Puesto: " + empleado[2]));
             }
 
+            // Confirmar la transacción después de realizar las operaciones
             session.getTransaction().commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            // Log de error mejorado para entender la causa de la excepción
+            System.err.println("xxx Error al listar empleados del departamento: " + e.getMessage());
         }
     }
 
-    @Override
-    public void listaDepartamentosEmpleados() {
 
-    }
-
+    /**
+     * Muestra el menú principal de opciones para gestionar departamentos.
+     */
     @Override
-    public void showMenu() {
+    public void mostrarMenu() {
         while (true) {
-            System.out.println("\n--- Menú Departamento ---");
-            System.out.println("1. Crear");
-            System.out.println("2. Leer");
-            System.out.println("3. Actualizar");
-            System.out.println("4. Eliminar");
-            System.out.println("5. Consultar empleados de un departamento");
-            System.out.println("6. Salir");
+            System.out.println("\n----------------------------------------------------");
+            System.out.println("---------------- Menú Departamento -----------------");
+            System.out.println("----------------------------------------------------");
+            System.out.println("|| 1. Crear                                       ||");
+            System.out.println("|| 2. Leer                                        ||");
+            System.out.println("|| 3. Actualizar                                  ||");
+            System.out.println("|| 4. Eliminar                                    ||");
+            System.out.println("|| 5. Consultar empleados de un departamento      ||");
+            System.out.println("|| 6. Salir                                       ||");
+            System.out.println("----------------------------------------------------");
 
-            System.out.print("Seleccione una opción: ");
-            int option = scanner.nextInt();
-            scanner.nextLine(); // Consumir el salto de línea
+            System.out.print(">> Seleccione una opción: ");
+            int option = sc.nextInt();
+            sc.nextLine(); // Consumir el salto de línea
 
             switch (option) {
-                case 1 -> create();
-                case 2 -> read();
-                case 3 -> update();
-                case 4 -> delete();
+                case 1 -> crear();
+                case 2 -> leer();
+                case 3 -> actualizar();
+                case 4 -> borrar();
                 case 5 -> listaEmpleadosDepartamento();
                 case 6 -> {
-                    System.out.println("Saliendo del menú...");
+                    System.out.println("--> Saliendo del menú ...");
                     return;
                 }
-                default -> System.out.println("Opción inválida.");
+                default -> System.out.println("xxx  Opción inválida  xxx");
             }
         }
     }
-
 }
-

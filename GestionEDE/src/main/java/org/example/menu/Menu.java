@@ -1,49 +1,77 @@
+/**
+ * Paquete que contiene la clase abstracta Menu.
+ */
 package org.example.menu;
 
 import java.util.Scanner;
 
+/**
+ * Clase abstracta que proporciona una estructura base para un menú genérico.
+ *
+ * @param <T>  Tipo de los elementos que manejará el menú.
+ * @param <ID> Tipo del identificador único de los elementos que manejará el menú.
+ */
 public abstract class Menu<T, ID> {
-    protected final Scanner scanner = new Scanner(System.in);
 
-    public abstract void create();
+    /**
+     * Escáner utilizado para capturar la entrada del usuario desde la consola.
+     */
+    protected final Scanner sc = new Scanner(System.in);
 
-    public abstract void read();
+    /**
+     * Método abstracto para crear un elemento.
+     * Debe ser implementado por las clases concretas que hereden esta clase.
+     */
+    public abstract void crear();
 
-    public abstract void update();
+    /**
+     * Método abstracto para leer elementos.
+     * Debe ser implementado por las clases concretas que hereden esta clase.
+     */
+    public abstract void leer();
 
-    public abstract void delete();
+    /**
+     * Método abstracto para actualizar un elemento.
+     * Debe ser implementado por las clases concretas que hereden esta clase.
+     */
+    public abstract void actualizar();
 
-    public abstract void listaEmpleadosDepartamento();
+    /**
+     * Método abstracto para borrar un elemento.
+     * Debe ser implementado por las clases concretas que hereden esta clase.
+     */
+    public abstract void borrar();
 
-    public abstract void listaDepartamentosEmpleados();
-
-    public void showMenu() {
+    /**
+     * Muestra el menú principal y gestiona las opciones seleccionadas por el usuario.
+     * Este método contiene un bucle que sigue mostrando el menú hasta que el usuario elija salir.
+     */
+    public void mostrarMenu() {
         while (true) {
-            System.out.println("-------------------");
-            System.out.println("------ Menú--------");
-            System.out.println("-------------------");
-            System.out.println("|| 1. Crear      ||");
-            System.out.println("|| 2. Leer       ||");
-            System.out.println("|| 3. Actualizar ||");
-            System.out.println("|| 4. Eliminar   ||");
-            System.out.println("|| 5. Salir      ||");
-            System.out.println("-------------------");
-            System.out.println("-------------------");
+            System.out.println("----------------------------------------------------");
+            System.out.println("----------------------- Menú -----------------------");
+            System.out.println("----------------------------------------------------");
+            System.out.println("|| 1. Crear\t\t\t\t\t  ||");
+            System.out.println("|| 2. Leer       \t\t\t\t  ||");
+            System.out.println("|| 3. Actualizar \t\t\t\t  ||");
+            System.out.println("|| 4. Eliminar   \t\t\t\t  ||");
+            System.out.println("|| 5. Salir      \t\t\t\t  ||");
+            System.out.println("----------------------------------------------------");
 
             System.out.print(">> Seleccione una opción: ");
-            int option = scanner.nextInt();
-            scanner.nextLine(); // Consumir el salto de línea
+            int option = sc.nextInt();
+            sc.nextLine(); // Consumir el salto de línea
 
             switch (option) {
-                case 1 -> create();
-                case 2 -> read();
-                case 3 -> update();
-                case 4 -> delete();
+                case 1 -> crear();
+                case 2 -> leer();
+                case 3 -> actualizar();
+                case 4 -> borrar();
                 case 5 -> {
-                    System.out.println(">> Saliendo del menú...");
+                    System.out.println("--> Saliendo del menú ...");
                     return;
                 }
-                default -> System.out.println(">> Opción inválida.");
+                default -> System.out.println("xxx  Opción inválida  xxx");
             }
         }
     }
